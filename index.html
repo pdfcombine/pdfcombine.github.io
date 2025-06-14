@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Merge PDF Files Online - Reorder and Combine PDFs in Browser</title>
+  <title>Merge PDFs Online Free</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <meta name="description" content="Merge PDF files online for free. Upload, reorder and combine PDFs directly in your browser. 100% secure, no server, no download required.">
+  <meta name="keywords" content="merge pdf, combine pdfs, reorder pdfs, online pdf tool, client side pdf merge, free pdf joiner, browser pdf tool">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px 80px;
+      color: #333;
+      background-color: #f8f9fa;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #222;
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+
+    p, ol, ul {
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    ol, ul {
+      padding-left: 20px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 20px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      max-width: 700px;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+      font-size: 14px;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .custom-upload {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      transition: background-color 0.2s ease;
+    }
+
+    .custom-upload:hover {
+      background-color: #218838;
+    }
+
+    .custom-upload input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    #file-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    #file-list li {
+      padding: 10px;
+      border: 1px solid #ccc;
+      margin: 6px 0;
+      cursor: move;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .filename {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .remove-btn {
+      margin-left: 10px;
+      color: red;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    #loading {
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #ffeeba;
+      border: 1px solid #f5c6cb;
+      color: #856404;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    a {
+      color: #007BFF;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      position: relative;
+    }
+
+    .close {
+      position: absolute;
+      right: 20px;
+      top: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #888;
+      cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      button, .custom-upload {
+        padding: 12px 20px;
+        font-size: 15px;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Merge PDF Files Online</h1>
+
+  <p><strong>Merge your PDF documents securely and for free, directly in your browser.</strong> No installation, no upload to server — everything happens on your device. This is the fastest and most private way to <strong>combine PDF files online</strong>.</p>
+  <p><em>You can combine as many PDF files as you need. However, too many or large files may slow down your browser.</em></p>
+
+  <div class="controls">
+    <label class="custom-upload">
+      Choose PDF(s)
+      <input type="file" id="pdfInput" accept="application/pdf" multiple />
+    </label>
+    <button onclick="mergePDFs()">Merge and Download</button>
+    <button onclick="clearAll()" style="background-color: #dc3545;">Clear All</button>
+  </div>
+
+  <ul id="file-list"></ul>
+
+  <div id="loading" style="display: none;">Merging PDFs...</div>
+
+  <h2>How to Merge PDF Files Online</h2>
+  <ol>
+    <li>Click <strong>"Choose PDF(s)"</strong> to select one or more PDF files from your computer.</li>
+    <li>Reorder them as needed by dragging and dropping in the list.</li>
+    <li>Click <strong>"Merge and Download"</strong> to generate and save the combined PDF.</li>
+  </ol>
+
+  <p>You can also remove individual files or click "Clear All" to start over. Everything happens locally in your browser — your files never leave your device.</p>
+
+  <h2>Why Use This PDF Merge Tool?</h2>
+  <p>
+    - 🔒 <strong>Secure:</strong> 100% client-side. Your PDF files never leave your device.<br>
+    - ⚡ <strong>Fast:</strong> Works instantly in your browser.<br>
+    - 🧩 <strong>Flexible:</strong> Upload multiple files, reorder them, and merge in one click.<br>
+    - 💡 <strong>Simple:</strong> No login, no ads, no watermarks.
+  </p>
+
+  <h2>Common Use Cases</h2>
+  <ul>
+    <li>Merge scanned pages into a single PDF</li>
+    <li>Combine invoices, receipts or forms</li>
+    <li>Reorder and compress PDF presentations</li>
+    <li>Split and recombine PDF chapters</li>
+  </ul>
+
+  <p>Use this free tool to <strong>merge PDF documents</strong> easily, securely, and instantly. Bookmark this page for future use!</p>
+
+  <footer>
+    <p>&copy; 2025 MattGDev. <a href="#" onclick="openModal()">Privacy Policy</a></p>
+  </footer>
+
+  <!-- Privacy Modal -->
+  <div id="privacyModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Privacy Policy & Terms of Use</h2>
+      <p>This agreement describes the conditions and rules under which MattGDev ("our company", "we") offers you this service.</p>
+
+      <h3>Terms</h3>
+      <ol>
+        <li>Use of this tool is at your own risk.</li>
+        <li>All processing happens in your browser — no data is uploaded.</li>
+        <li>You agree not to use the service to process illegal materials.</li>
+        <li>You agree not to integrate this tool into third-party applications without permission.</li>
+        <li>You may use the tool for personal or commercial purposes.</li>
+        <li>We may change or discontinue this service at any time.</li>
+        <li>We may update these terms without notice.</li>
+        <li>This tool is provided "as-is" without warranties.</li>
+      </ol>
+
+      <h3>Privacy</h3>
+      <ol start="9">
+        <li>All processing is done client-side. No files are transmitted to any server.</li>
+        <li>Your files remain completely private and never leave your computer.</li>
+        <li>We do not store or share any user data. No analytics or cookies are used.</li>
+      </ol>
+      <p>The developer assumes no responsibility or liability for any use of this service. You use this service entirely at your own risk.</p>
+    </div>
+  </div>
+
+  <script>
+    const pdfInput = document.getElementById('pdfInput');
+    const fileList = document.getElementById('file-list');
+    const loadingDiv = document.getElementById('loading');
+    let filesArray = [];
+
+    pdfInput.addEventListener('change', () => {
+      const files = Array.from(pdfInput.files);
+      if (!files.length) return;
+
+      files.forEach(file => {
+        const fileIndex = filesArray.push(file) - 1;
+
+        const li = document.createElement('li');
+        li.setAttribute('data-index', fileIndex);
+        li.innerHTML = `
+          <span class="filename">${file.name}</span>
+          <span class="remove-btn" onclick="removeFile(this)">✕</span>
+        `;
+        fileList.appendChild(li);
+      });
+
+      pdfInput.value = '';
+    });
+
+    new Sortable(fileList, {
+      animation: 150,
+      scroll: true,
+      scrollSensitivity: 20,
+      scrollSpeed: 15
+    });
+
+    function removeFile(button) {
+      const li = button.closest('li');
+      const index = parseInt(li.getAttribute('data-index'));
+      filesArray[index] = null;
+      li.remove();
+    }
+
+    function clearAll() {
+      fileList.innerHTML = '';
+      filesArray = [];
+    }
+
+    async function mergePDFs() {
+      const { PDFDocument } = PDFLib;
+      loadingDiv.style.display = 'block';
+
+      const mergedPdf = await PDFDocument.create();
+
+      const orderedItems = fileList.querySelectorAll('li');
+      const orderedFiles = Array.from(orderedItems)
+        .map(li => parseInt(li.getAttribute('data-index')))
+        .map(i => filesArray[i])
+        .filter(f => f);
+
+      if (!orderedFiles.length) {
+        alert("No files to merge.");
+        loadingDiv.style.display = 'none';
+        return;
+      }
+
+      for (const file of orderedFiles) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        copiedPages.forEach(page => mergedPdf.addPage(page));
+      }
+
+      const mergedPdfBytes = await mergedPdf.save();
+      const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'merged.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      loadingDiv.style.display = 'none';
+    }
+
+    function openModal() {
+      document.getElementById('privacyModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('privacyModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('privacyModal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+</body>
+</html>
