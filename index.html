@@ -234,6 +234,11 @@
     </label>
     <button onclick="mergePDFs()">Merge and Download</button>
     <button onclick="clearAll()" style="background-color: #dc3545;">Clear All</button>
+    <label style="display: flex; align-items: center; gap: 6px;">
+      <input type="checkbox" id="compressOption">
+      Compress merged PDF (smaller size)
+    </label>
+
   </div>
 
   <ul id="file-list"></ul>
@@ -380,6 +385,7 @@
       const { PDFDocument } = PDFLib;
 
       const mergedPdf = await PDFDocument.create();
+      const compress = document.getElementById('compressOption').checked;
 
       const orderedItems = fileList.querySelectorAll('li');
       const orderedFiles = Array.from(orderedItems)
@@ -400,7 +406,7 @@
         copiedPages.forEach(page => mergedPdf.addPage(page));
       }
 
-      const mergedPdfBytes = await mergedPdf.save();
+      const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: compress });
       const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
 
