@@ -349,9 +349,12 @@
         if (evt.target.classList.contains('remove-btn')) {
           removeFile(evt.target);
         }
-      }
+      },
+      delay: 150, 
+      delayOnTouchOnly: true, 
+      touchStartThreshold: 5 
     });
-
+    
     function removeFile(button) {
       const li = button.closest('li');
       const index = parseInt(li.getAttribute('data-index'));
