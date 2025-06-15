@@ -322,7 +322,7 @@
         li.setAttribute('data-index', fileIndex);
         li.innerHTML = `
           <span class="filename">${file.name}</span>
-          <span class="remove-btn" onclick="removeFile(this)">✕</span>
+          <span class="remove-btn">✕</span>
         `;
         fileList.appendChild(li);
       });
@@ -334,7 +334,14 @@
       animation: 150,
       scroll: true,
       scrollSensitivity: 20,
-      scrollSpeed: 15
+      scrollSpeed: 15,
+      handle: '.filename', 
+      filter: '.remove-btn',
+      onFilter: function (evt) {
+        if (evt.target.classList.contains('remove-btn')) {
+          removeFile(evt.target);
+        }
+      }
     });
 
     function removeFile(button) {
@@ -350,8 +357,8 @@
     }
 
     async function mergePDFs() {
-      const { PDFDocument } = PDFLib;
       loadingDiv.style.display = 'block';
+      const { PDFDocument } = PDFLib;
 
       const mergedPdf = await PDFDocument.create();
 
